@@ -1,0 +1,17 @@
+node_modules/
+dist/
+build/
+coverage/
+.turbo/
+playwright-report/
+test-results/
+storybook-static/
+.serverless/
+.generated/
+.env
+.env.*
+!.env.example
+.DS_Store
+.idea/
+*.log
+*.lock

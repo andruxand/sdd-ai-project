@@ -1,0 +1,24 @@
+# Auto-detect text files and normalize line endings
+* text=auto
+
+# Force LF line endings for scripts and config
+*.ts text eol=lf
+*.tsx text eol=lf
+*.js text eol=lf
+*.mjs text eol=lf
+*.cjs text eol=lf
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.md text eol=lf
+*.graphql text eol=lf
+*.sh text eol=lf
+
+# Mark lock files as binary (reduce diff noise)
+package-lock.json binary
+
+# Linguist overrides for GitHub stats
+coverage/** linguist-generated
+.generated/** linguist-generated
+storybook-static/** linguist-generated
+dist/** linguist-generated

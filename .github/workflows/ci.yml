@@ -1,0 +1,29 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main, develop, qa, cert]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - name: Architecture boundary check (DDD + Hexagonal / FSD)
+        run: npm run arch:lint
+      - run: npm run format:check
+      - run: npm run md:lint
+      - run: npm run yaml:lint
+      - run: npm run spellcheck
+      - run: npm run typecheck
+      - run: npm run coverage
+      - run: npm run openspec:validate
+      - name: Dependency audit (fail on high/critical)
+        run: npm audit --audit-level=high

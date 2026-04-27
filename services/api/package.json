@@ -1,0 +1,25 @@
+{
+  "name": "@template/api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "serverless offline start",
+    "dev:watch": "serverless offline start --reloadHandler",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage",
+    "sls:print": "serverless print",
+    "sls:package": "serverless package",
+    "deploy:dev": "serverless deploy --stage dev",
+    "deploy:prod": "serverless deploy --stage prod",
+    "invoke:local": "serverless invoke local --function",
+    "logs:dev": "serverless logs --tail --stage dev --function"
+  },
+  "devDependencies": {
+    "@aws-lambda-powertools/logger": "2.33.0",
+    "@aws-lambda-powertools/metrics": "2.33.0",
+    "@aws-lambda-powertools/tracer": "2.33.0",
+    "serverless-offline": "^14.4.0"
+  }
+}

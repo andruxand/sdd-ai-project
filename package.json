@@ -1,0 +1,98 @@
+{
+  "name": "sdd-ai-template-v3",
+  "private": true,
+  "type": "module",
+  "packageManager": "npm@10.9.7",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "workspaces": [
+    "apps/*",
+    "services/*",
+    "packages/config",
+    "packages/contracts",
+    "packages/shared/ui"
+  ],
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "dev:api": "turbo run dev --filter=@template/api",
+    "dev:web": "turbo run dev --filter=@template/web",
+    "build": "turbo run build",
+    "bootstrap": "node ./scripts/bootstrap.mjs",
+    "bootstrap:preview": "node ./scripts/bootstrap.mjs --preview",
+    "openspec:init": "node scripts/openspec-stub.mjs init",
+    "openspec:profile": "node scripts/openspec-stub.mjs profile",
+    "openspec:update": "node scripts/openspec-stub.mjs update",
+    "openspec:validate": "node scripts/openspec-validate.mjs",
+    "openspec:status": "node scripts/openspec-stub.mjs status",
+    "agent:lint": "node scripts/agent-lint.mjs",
+    "validate": "npm run lint && npm run format:check && npm run md:lint && npm run yaml:lint && npm run spellcheck && npm run typecheck && npm run coverage && npm run agent:lint",
+    "lint": "eslint .",
+    "arch:lint": "eslint services/ apps/web/src/ packages/shared/ui/",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "md:lint": "markdownlint-cli2 \"**/*.md\"",
+    "yaml:lint": "node ./scripts/yaml-lint.mjs",
+    "spellcheck": "cspell \"**/*\" --no-progress",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "prepare": "husky",
+    "coverage": "turbo run coverage",
+    "release": "changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.29.0",
+    "@commitlint/cli": "^20.5.0",
+    "@commitlint/config-conventional": "^20.5.0",
+    "@cspell/dict-es-es": "3.0.8",
+    "@eslint/js": "^9.29.0",
+    "@inquirer/prompts": "8.4.2",
+    "@playwright/test": "^1.53.0",
+    "@serverless/typescript": "^4.18.2",
+    "@storybook/addon-a11y": "^10.3.5",
+    "@storybook/addon-docs": "^10.3.5",
+    "@storybook/react-vite": "^10.3.5",
+    "@types/node": "^22.15.29",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^4.5.2",
+    "@vitest/coverage-v8": "^3.2.4",
+    "cspell": "^8.8.4",
+    "eslint": "^10.2.1",
+    "eslint-plugin-boundaries": "6.0.2",
+    "eslint-plugin-import-x": "^4.12.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-unused-imports": "^4.1.4",
+    "graphql": "^16.11.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "markdownlint-cli2": "^0.22.1",
+    "prettier": "^3.6.2",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "serverless": "^4.18.2",
+    "storybook": "^10.3.5",
+    "turbo": "^2.5.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.46.1",
+    "vite": "^5.4.14",
+    "vitest": "^3.2.4",
+    "yaml": "^2.8.1"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,mjs,cjs}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.json": [
+      "prettier --write"
+    ],
+    "*.md": [
+      "prettier --write",
+      "markdownlint-cli2"
+    ],
+    "*.{yml,yaml}": [
+      "prettier --write"
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "profiles": {
+    "topology": ["monorepo", "split-repos"],
+    "scope": ["backend-only", "frontend-only", "fullstack"],
+    "contracts": ["rest", "graphql", "both", "none"],
+    "criticality": ["standard", "hardened", "critical"],
+    "_criticality_note": "auto-derived at bootstrap (not asked interactively)",
+    "designSystem": ["with-design-system", "without-design-system"],
+    "uiLibrary": ["tailwind", "mui", "antd", "chakra", "bootstrap", "none"]
+  },
+  "modules": [
+    "storybook",
+    "playwright",
+    "contract-rest",
+    "contract-graphql",
+    "observability-pack",
+    "aws-pack",
+    "release-pack",
+    "qodo-pack",
+    "changesets-pack"
+  ]
+}

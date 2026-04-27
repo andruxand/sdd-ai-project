@@ -1,0 +1,52 @@
+name: Lighthouse CI
+
+on:
+  pull_request:
+    paths:
+      - 'apps/web/**'
+      - '.lighthouserc.cjs'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web app
+        run: npm run build --workspace=apps/web
+        env:
+          # Provide stub values for env vars required at build time.
+          # These are not real secrets — they produce a build that renders
+          # the loading/error state for any feature that needs real API data.
+          VITE_API_BASE_URL: https://api.example.com
+          VITE_ENV: production
+          VITE_DD_APPLICATION_ID: 00000000-0000-0000-0000-000000000000
+          VITE_DD_CLIENT_TOKEN: pubxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+      - name: Install Chromium for Lighthouse
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Lighthouse CI
+        run: npx @lhci/cli@0.14.x autorun
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: Upload Lighthouse report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-report
+          path: .lighthouseci/
+          retention-days: 14

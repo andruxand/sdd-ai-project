@@ -1,0 +1,16 @@
+name: IaC Scan
+on:
+  pull_request:
+jobs:
+  checkov:
+    if: github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: .
+          soft_fail: true

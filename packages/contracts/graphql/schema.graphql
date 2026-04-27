@@ -1,0 +1,33 @@
+# Main GraphQL schema — entry point.
+#
+# This file defines the base root types. Domain modules in `modules/`
+# use `extend type Query` / `extend type Mutation` to add their operations.
+#
+# At validation/build time, all .graphql files are concatenated into a
+# single schema. The entry point must define Query (and optionally Mutation)
+# so that modules can extend them.
+#
+# Adding a new domain:
+# 1. Create `modules/<domain>.graphql` with extend type Query { ... }
+# 2. Add your domain types in the same file.
+# 3. Run validation to confirm the schema is valid.
+
+"""
+Health check — confirms the API is running.
+"""
+type Query {
+  """
+  Returns service health status.
+  """
+  _health: String
+}
+
+"""
+Base mutation type — extend in domain modules.
+"""
+type Mutation {
+  """
+  No-op placeholder. Remove when you add your first real mutation.
+  """
+  _noop: String
+}

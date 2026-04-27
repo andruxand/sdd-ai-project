@@ -1,0 +1,15 @@
+{
+  "name": "@project/contracts",
+  "private": true,
+  "version": "0.0.0",
+  "description": "API contracts (OpenAPI, GraphQL schemas, shared types)",
+  "scripts": {
+    "lint:openapi": "redocly lint rest/openapi.yaml",
+    "lint:graphql": "graphql-inspector validate 'graphql/**/*.graphql'",
+    "generate:types": "openapi-typescript rest/openapi.yaml -o rest/types.gen.ts",
+    "validate": "npm run lint:openapi && npm run lint:graphql"
+  },
+  "devDependencies": {
+    "openapi-typescript": "^7.8.0"
+  }
+}

@@ -1,0 +1,133 @@
+# Agent OS Profile: Backend Only
+# Generated/selected by bootstrap when scope=backend-only.
+
+schema: agent-os-profile-v1
+
+identity:
+  name: backend-only
+  topology: monorepo # override: monorepo | split-repos
+  scope: backend-only
+  contracts: rest # override: rest | graphql | both | none
+  criticality: standard # override: standard | hardened | critical
+  designSystem: without-design-system
+
+# Active workspaces in this profile
+workspaces:
+  backend: services/api
+  contracts: packages/contracts
+  config: packages/config
+  # frontend and sharedUi removed by bootstrap
+
+# Agent routing for this profile
+routing:
+  default: standard-backend
+  # Flow: openspec → [contracts-implementer] → backend-implementer → [observability-implementer] → tester-backend → [security] → reviewer → [pr-comment-resolver]
+  agents:
+    openspec: always
+    backend-implementer: always
+    contracts-implementer: when-contracts
+    observability-implementer: when-observability
+    tester-backend: always
+    security: when-high-risk
+    # when-high-risk = any of: public endpoint added/modified, auth/Cognito/JWT
+    # change, IAM role/policy change, WAF/throttling/VPC change, or risk>=medium
+    # in the OpenSpec proposal. When in doubt: run it.
+    reviewer: always
+    pr-comment-resolver: when-pr-feedback
+    # frontend agents disabled for this profile
+    frontend-implementer: disabled
+    tester-frontend: disabled
+    e2e-tester: disabled
+
+# Modules enabled for this profile
+modules:
+  storybook: false
+  playwright: false
+  contractRest: true
+  contractGraphql: false
+  observabilityPack: true
+  awsPack: true
+  releasePack: true
+  qodoPack: false
+  changesetsPack: false
+
+# CI workflows active
+workflows:
+  ci: true
+  gitleaks: true
+  codeql: true
+  dependencyReview: true
+  scorecard: true
+  riskGate: true
+  contractsRest: true
+  contractsGraphql: false
+  playwright: false
+  checkov: true
+  cfnLint: true
+  cfnGuard: true
+
+# Standards applicable
+standards:
+  - docs/standards/aws-architecture.md
+  - docs/standards/aws-security.md
+  - docs/standards/aws-logging-observability.md
+  - docs/standards/serverless-v4.md
+  - docs/standards/contracts.md
+  - docs/standards/git-branching.md
+  - docs/standards/documentation.md
+
+# Skills active
+skills:
+  backend:
+    - serverless-baseline # conditional: new service / reviewing serverless.ts
+    - serverless-endpoint
+    - middy-patterns
+    - backend-task-execution
+    - backend-test-hardening
+    - log-sanitization
+    - observability-hardening
+    - dynamodb-patterns
+    - async-patterns
+    - idempotency-patterns
+    - cognito-auth-patterns
+    - domain-error-hierarchy
+    - lambda-performance
+    - feature-flags
+    - input-validation-patterns
+    - secret-management
+    - api-versioning
+    - circuit-breaker
+    - http-client-retry
+    - deployment-canary
+    - load-testing-k6
+    - webhook-patterns # conditional: when feature has webhook receiver
+    - encryption-patterns # conditional: when feature handles PII/sensitive data
+    - dynamodb-migrations # conditional: when evolving existing table schema
+    - websocket-apigateway # conditional: when feature needs real-time WebSocket
+    - s3-storage-patterns # conditional: when feature involves file upload/download/storage
+    - powertools-patterns
+    - ddd-hexagonal-patterns
+    - vitest-patterns
+  contracts:
+    - contract-rest
+    - contract-diff-prep
+  crossCutting:
+    - openspec-proposal
+    - feature-routing
+    - risk-assessment
+    - aws-well-architected-review
+    - security
+    - pr-prep
+    - pr-comment-resolution
+    - comment-learning
+    - review-learning-update
+    - jira-intake
+    - typescript-patterns
+    - dependency-vetting
+observability:
+  platform: cloudwatch-xray
+  structuredLogs: true
+  correlationId: true
+  tracing: true
+  customMetrics: true
+  logRetentionDays: 30

@@ -1,0 +1,50 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Validate All",
+      "type": "shell",
+      "command": "npm run validate",
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": ["$eslint-stylish", "$tsc"],
+      "presentation": { "reveal": "always", "panel": "shared" }
+    },
+    {
+      "label": "Lint",
+      "type": "shell",
+      "command": "npm run lint",
+      "problemMatcher": ["$eslint-stylish"]
+    },
+    {
+      "label": "Typecheck",
+      "type": "shell",
+      "command": "npm run typecheck",
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "Test",
+      "type": "shell",
+      "command": "npm run test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Coverage",
+      "type": "shell",
+      "command": "npm run coverage",
+      "problemMatcher": []
+    },
+    {
+      "label": "OpenSpec Validate",
+      "type": "shell",
+      "command": "npm run openspec:validate",
+      "problemMatcher": []
+    },
+    {
+      "label": "Storybook Dev",
+      "type": "shell",
+      "command": "npx storybook dev -p 6006",
+      "isBackground": true,
+      "problemMatcher": []
+    }
+  ]
+}

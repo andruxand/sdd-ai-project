@@ -1,0 +1,19 @@
+extends:
+  - recommended
+
+apis:
+  main@v1:
+    root: ./rest/openapi.yaml
+    rules:
+      no-ambiguous-paths: error
+      operation-operationId: error
+      operation-description: warn
+      tag-description: warn
+  # Uncomment to add more APIs:
+  # internal@v1:
+  #   root: ./rest/internal-openapi.yaml
+
+rules:
+  no-unused-components: warn
+  operation-operationId: error
+  operation-summary: error

@@ -1,0 +1,32 @@
+name: Feature Request
+description: Standardized intake for product work
+title: '[FEATURE] '
+body:
+  - type: textarea
+    id: business_context
+    attributes:
+      label: Business context
+  - type: textarea
+    id: user_problem
+    attributes:
+      label: User problem
+  - type: textarea
+    id: desired_outcome
+    attributes:
+      label: Desired outcome
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+  - type: textarea
+    id: out_of_scope
+    attributes:
+      label: Out of scope
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria

@@ -1,0 +1,103 @@
+# Example domain module — copy and adapt for your bounded context.
+#
+# Convention:
+# - One file per domain (orders, users, payments, etc.)
+# - Use `extend type Query` and `extend type Mutation` to add operations.
+# - Define domain types in the same file.
+# - Add doc comments (""") to all types and fields.
+#
+# Delete this file after creating your first real module.
+
+# Extends Query with order-related operations.
+extend type Query {
+  """
+  Returns a paginated list of orders.
+  """
+  orders(limit: Int = 20, cursor: String): OrderConnection!
+
+  """
+  Returns a single order by ID.
+  """
+  order(id: ID!): Order
+}
+
+# Extends Mutation with order-related operations.
+extend type Mutation {
+  """
+  Creates a new order.
+  """
+  createOrder(input: CreateOrderInput!): Order!
+}
+
+# ── Domain types ──
+
+"""
+Paginated list of orders.
+"""
+type OrderConnection {
+  """
+  List of order items.
+  """
+  items: [Order!]!
+  """
+  Cursor for the next page, null if no more results.
+  """
+  nextCursor: String
+}
+
+"""
+Represents a customer order.
+"""
+type Order {
+  """
+  Unique order identifier.
+  """
+  id: ID!
+  """
+  Current status of the order.
+  """
+  status: OrderStatus!
+  """
+  ISO 8601 timestamp of order creation.
+  """
+  createdAt: String!
+  """
+  ISO 8601 timestamp of last update.
+  """
+  updatedAt: String
+}
+
+"""
+Possible order statuses.
+"""
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+"""
+Input for creating a new order.
+"""
+input CreateOrderInput {
+  """
+  Items to include in the order.
+  """
+  items: [OrderItemInput!]!
+}
+
+"""
+A single item in an order creation request.
+"""
+input OrderItemInput {
+  """
+  Product identifier.
+  """
+  productId: ID!
+  """
+  Quantity requested.
+  """
+  quantity: Int!
+}

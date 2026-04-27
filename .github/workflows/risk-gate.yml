@@ -1,0 +1,50 @@
+name: Risk Gate
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  risk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            high:
+              - 'infra/**'
+              - 'services/*/serverless.ts'
+              - 'services/*/serverless.yml'
+              - 'services/**/auth/**'
+              - 'services/**/security/**'
+              - 'services/**/permissions/**'
+              - 'services/**/migrations/**'
+              - 'packages/contracts/**'
+              - 'services/**/domain/**'
+              - 'services/**/application/**'
+              - 'packages/shared/ui/src/atoms/**'
+              - 'packages/shared/ui/src/molecules/**'
+              - 'packages/shared/ui/src/organisms/**'
+            medium:
+              - 'services/**'
+              - 'apps/**'
+              - 'packages/**'
+            low:
+              - 'docs/**'
+      - uses: actions/github-script@v9
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            let risk = "risk:low";
+            if ("${{ steps.filter.outputs.high }}" === "true") risk = "risk:high";
+            else if ("${{ steps.filter.outputs.medium }}" === "true") risk = "risk:medium";
+            const { data: labels } = await github.rest.issues.listLabelsOnIssue({ owner, repo, issue_number: pr.number });
+            for (const label of labels.map(l => l.name).filter(n => n.startsWith("risk:"))) {
+              await github.rest.issues.removeLabel({ owner, repo, issue_number: pr.number, name: label }).catch(() => {});
+            }
+            await github.rest.issues.addLabels({ owner, repo, issue_number: pr.number, labels: [risk] });

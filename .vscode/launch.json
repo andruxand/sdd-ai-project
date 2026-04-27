@@ -1,0 +1,35 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Vitest (current file)",
+      "type": "node",
+      "request": "launch",
+      "autoAttachChildProcesses": true,
+      "skipFiles": ["<node_internals>/**", "**/node_modules/**"],
+      "program": "${workspaceRoot}/node_modules/vitest/vitest.mjs",
+      "args": ["run", "${relativeFile}"],
+      "smartStep": true,
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Debug Serverless Offline",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/services/api",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serverless", "offline", "start", "--stage", "local"],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Debug Playwright (current file)",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/apps/web",
+      "program": "${workspaceRoot}/node_modules/@playwright/test/cli.js",
+      "args": ["test", "${relativeFile}", "--headed"],
+      "console": "integratedTerminal"
+    }
+  ]
+}

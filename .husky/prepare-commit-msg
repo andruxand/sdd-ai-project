@@ -1,0 +1,29 @@
+#!/usr/bin/env sh
+
+# Extracts Jira key from branch name and prepends it to commit message.
+# Example: branch "PROJ-123-add-login" → commit message gets "PROJ-123: " prefix.
+# Only applies to branch names matching the pattern [A-Z]+-[0-9]+
+
+COMMIT_MSG_FILE="$1"
+BRANCH_NAME=$(git symbolic-ref --short HEAD 2>/dev/null)
+
+# Skip for detached HEAD, merge commits, amend
+if [ -z "$BRANCH_NAME" ]; then
+  exit 0
+fi
+
+# Extract Jira key (e.g., PROJ-123) from branch name
+JIRA_KEY=$(echo "$BRANCH_NAME" | grep -oE '^[A-Z]+-[0-9]+' || true)
+
+if [ -z "$JIRA_KEY" ]; then
+  exit 0
+fi
+
+# Don't add if the message already contains the Jira key
+CURRENT_MSG=$(cat "$COMMIT_MSG_FILE")
+if echo "$CURRENT_MSG" | grep -qF "$JIRA_KEY"; then
+  exit 0
+fi
+
+# Prepend Jira key to commit message
+echo "$JIRA_KEY: $CURRENT_MSG" > "$COMMIT_MSG_FILE"

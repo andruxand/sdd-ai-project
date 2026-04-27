@@ -1,0 +1,28 @@
+changelog:
+  categories:
+    - title: '🚀 Features'
+      labels:
+        - 'feature'
+        - 'enhancement'
+    - title: '🐛 Bug Fixes'
+      labels:
+        - 'bug'
+        - 'fix'
+    - title: '📖 Documentation'
+      labels:
+        - 'documentation'
+        - 'area:docs'
+    - title: '🔧 Configuration & Tooling'
+      labels:
+        - 'area:config'
+        - 'area:infra'
+        - 'area:ai-tooling'
+    - title: '📦 Dependencies'
+      labels:
+        - 'dependencies'
+    - title: '🔒 Security'
+      labels:
+        - 'security'
+    - title: 'Other Changes'
+      labels:
+        - '*'

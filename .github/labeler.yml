@@ -1,0 +1,49 @@
+# Auto-label PRs based on file paths
+'area:api':
+  - changed-files:
+      - any-glob-to-any-file: 'services/api/**'
+
+'area:web':
+  - changed-files:
+      - any-glob-to-any-file: 'apps/web/**'
+
+'area:contracts':
+  - changed-files:
+      - any-glob-to-any-file: 'packages/contracts/**'
+
+'area:shared-ui':
+  - changed-files:
+      - any-glob-to-any-file: 'packages/shared/ui/**'
+
+'area:docs':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'docs/**'
+          - '*.md'
+
+'area:config':
+  - changed-files:
+      - any-glob-to-any-file: 'packages/config/**'
+
+'area:infra':
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.github/workflows/**'
+          - 'serverless.ts'
+          - '.devcontainer/**'
+
+'area:ai-tooling':
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.github/agents/**'
+          - '.github/skills/**'
+          - '.github/prompts/**'
+          - '.github/instructions/**'
+          - '.github/copilot-instructions.md'
+          - 'CLAUDE.md'
+          - 'AGENTS.md'
+          - 'agent-os/**'
+
+'area:openspec':
+  - changed-files:
+      - any-glob-to-any-file: 'openspec/**'

@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+storybook-static/
+.serverless/
+
+# Generated files
+.generated/
+coverage/
+playwright-report/
+test-results/
+
+# Lock files
+*.lock
+package-lock.json
+
+# Environment files
+.env
+.env.*
+!.env.example

@@ -1,0 +1,27 @@
+schema: core
+
+context:
+  # TODO: change this to your actual project name after bootstrap
+  # Example: project_name: 'my-service'
+  project_name: 'template-v3'
+  # TODO: set this to your actual UI library after bootstrap (tailwind/mui/antd/chakra/bootstrap/none)
+  ui_library: 'none'
+  architecture:
+    backend: 'DDD + explicit boundaries where applicable'
+    frontend: 'FSD + Atomic inside shared/ui where applicable'
+  repo_goals:
+    - 'Spec-driven development'
+    - 'AI as executor, human as orchestrator'
+    - 'Security and observability by default'
+    - 'Small, reviewable, rollback-aware changes'
+
+rules:
+  proposal:
+    - 'Must reference Jira key and business goal'
+    - 'Must identify risks, dependencies, and open questions'
+    - 'Must capture rollback considerations'
+  design:
+    - 'Must describe contracts, boundaries, logs, tracing, retries, and security implications'
+  tasks:
+    - 'Must be small and independently verifiable'
+    - 'Must include docs, tests, and contract updates when behavior changes'

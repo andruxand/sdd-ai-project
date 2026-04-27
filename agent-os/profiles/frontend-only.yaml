@@ -1,0 +1,121 @@
+# Agent OS Profile: Frontend Only
+# Generated/selected by bootstrap when scope=frontend-only.
+
+schema: agent-os-profile-v1
+
+identity:
+  name: frontend-only
+  topology: monorepo # override: monorepo | split-repos
+  scope: frontend-only
+  contracts: none
+  criticality: standard # override: standard | hardened | critical
+  designSystem: with-design-system # override: with-design-system | without-design-system
+
+# Active workspaces in this profile
+workspaces:
+  frontend: apps/web
+  sharedUi: packages/shared/ui
+  config: packages/config
+  # backend and contracts removed by bootstrap
+
+# Agent routing for this profile
+routing:
+  default: standard-frontend
+  # Flow: openspec → frontend-implementer → tester-frontend → [e2e-tester] → reviewer → [pr-comment-resolver]
+  agents:
+    openspec: always
+    frontend-implementer: always
+    tester-frontend: always
+    e2e-tester: when-e2e
+    reviewer: always
+    pr-comment-resolver: when-pr-feedback
+    security: when-high-risk
+    # when-high-risk = auth flows in UI, sensitive data forms, PII display,
+    # or risk>=medium in the OpenSpec proposal. When in doubt: run it.
+    # backend agents disabled for this profile
+    backend-implementer: disabled
+    contracts-implementer: disabled
+    observability-implementer: disabled
+    tester-backend: disabled
+
+# Modules enabled for this profile
+modules:
+  storybook: true
+  playwright: true
+  contractRest: false
+  contractGraphql: false
+  observabilityPack: false
+  awsPack: false
+  releasePack: true
+  qodoPack: false
+  changesetsPack: false
+
+# CI workflows active
+workflows:
+  ci: true
+  gitleaks: true
+  codeql: true
+  dependencyReview: true
+  scorecard: true
+  riskGate: true
+  contractsRest: false
+  contractsGraphql: false
+  playwright: true
+  checkov: false
+  cfnLint: false
+  cfnGuard: false
+
+# Standards applicable
+standards:
+  - docs/standards/frontend-storybook.md
+  - docs/standards/ui-libraries.md
+  - docs/standards/documentation.md
+
+# Skills active
+skills:
+  frontend:
+    - frontend-task-execution
+    - frontend-test-hardening
+    - e2e-flow-hardening
+    - component-governance # always-active: inventory check, reuse/extend/create, API design, deprecation
+    - react-fsd-feature
+    - storybook-component
+    - react-query-patterns
+    - zustand-patterns
+    - form-validation-patterns
+    - msw-mock-patterns
+    - graphql-client-patterns
+    - accessibility-a11y
+    - core-web-vitals
+    - react-patterns
+    # UI library skill — only one of these exists on disk after bootstrap.
+    # The active skill is determined by ui_library in openspec/config.yaml.
+    # See docs/standards/ui-libraries.md for full reference.
+    - tailwind-patterns # active when ui_library = tailwind
+    - mui-patterns # active when ui_library = mui
+    - antd-patterns # active when ui_library = antd
+    - chakra-patterns # active when ui_library = chakra
+    - bootstrap-patterns # active when ui_library = bootstrap
+    - css-modules-patterns # active when ui_library = none
+    - cloudfront-spa-deploy # conditional: when deploying SPA to CloudFront + S3
+    - datadog-rum-patterns
+    - vitest-patterns
+  crossCutting:
+    - openspec-proposal
+    - feature-routing
+    - risk-assessment
+    - security
+    - pr-prep
+    - pr-comment-resolution
+    - comment-learning
+    - review-learning-update
+    - typescript-patterns
+    - dependency-vetting
+
+observability:
+  platform: none
+  structuredLogs: false
+  correlationId: false
+  tracing: false
+  customMetrics: false
+  logRetentionDays: 0

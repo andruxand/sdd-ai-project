@@ -1,0 +1,33 @@
+# Cursor Rules — SDD AI Template
+
+# This file mirrors the project instructions for Cursor IDE users.
+
+# The canonical source is .github/copilot-instructions.md
+
+# For full agent routing, session management, and handoff protocol, see AGENTS.md
+
+# Read these files for complete context:
+
+# - .github/copilot-instructions.md (project rules)
+
+# - AGENTS.md (agent flow, routing, session protocol)
+
+# - CONTRIBUTING.md (branch, commit, PR conventions)
+
+# Quick reference:
+
+# - Use spec-driven development. Do not implement before scope is explicit.
+
+# - Preserve architecture boundaries.
+
+# - Never expose secrets in code, tests, logs, or comments.
+
+# - Update docs/specs/storybook when behavior changes.
+
+# - Always consider rollback.
+
+# - Use short, focused sessions: one phase per session.
+
+# - Generate handoff between phases.
+
+# - Use @file references instead of pasting file contents.

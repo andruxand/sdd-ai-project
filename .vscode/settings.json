@@ -1,0 +1,16 @@
+{
+  "github.copilot.chat.codeGeneration.useInstructionFiles": true,
+  "github.copilot.chat.organizationCustomAgents.enabled": true,
+  "github.copilot.chat.organizationInstructions.enabled": true,
+  "chat.promptFiles": true,
+  "chat.agentFiles": true,
+  "chat.agentSkills": true,
+  "chat.mcp.access": "all",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.useFlatConfig": true,
+  "typescript.tsdk": "node_modules/typescript/lib"
+}

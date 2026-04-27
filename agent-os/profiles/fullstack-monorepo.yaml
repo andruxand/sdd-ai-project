@@ -1,0 +1,167 @@
+# Agent OS Profile: Fullstack Monorepo
+# Generated/selected by bootstrap based on profile choices.
+
+schema: agent-os-profile-v1
+
+identity:
+  name: fullstack-monorepo
+  topology: monorepo
+  scope: fullstack
+  contracts: both # override: rest | graphql | both | none
+  criticality: standard # override: standard | hardened | critical
+  designSystem: with-design-system # override: with-design-system | without-design-system
+
+# Active workspaces in this profile
+workspaces:
+  backend: services/api
+  frontend: apps/web
+  contracts: packages/contracts
+  sharedUi: packages/shared/ui
+  config: packages/config
+
+# Agent routing for this profile
+routing:
+  default: fullstack
+  # Flow: openspec → contracts-implementer → backend-implementer → frontend-implementer
+  #       → observability-implementer → tester-backend → tester-frontend → e2e-tester
+  #       → [security] → reviewer → [pr-comment-resolver]
+  agents:
+    openspec: always
+    backend-implementer: when-backend
+    frontend-implementer: when-frontend
+    contracts-implementer: when-contracts
+    observability-implementer: when-observability
+    tester-backend: when-backend
+    tester-frontend: when-frontend
+    e2e-tester: when-e2e
+    security: when-high-risk
+    # when-high-risk = any of: public endpoint added/modified, auth/Cognito/JWT
+    # change, IAM role/policy change, WAF/throttling/VPC change, or risk>=medium
+    # in the OpenSpec proposal. When in doubt: run it.
+    reviewer: always
+    pr-comment-resolver: when-pr-feedback
+
+# Modules enabled for this profile
+modules:
+  storybook: true
+  playwright: true
+  contractRest: true # depends on contracts selection
+  contractGraphql: true # depends on contracts selection
+  observabilityPack: true
+  awsPack: true
+  releasePack: true
+  qodoPack: false
+  changesetsPack: false
+
+# CI workflows active for this profile
+workflows:
+  ci: true
+  gitleaks: true
+  codeql: true
+  dependencyReview: true
+  scorecard: true
+  riskGate: true
+  contractsRest: true
+  contractsGraphql: true
+  playwright: true
+  checkov: true
+  cfnLint: true
+  cfnGuard: true
+
+# Standards applicable to this profile
+standards:
+  - docs/standards/aws-architecture.md
+  - docs/standards/aws-security.md
+  - docs/standards/aws-logging-observability.md
+  - docs/standards/serverless-v4.md
+  - docs/standards/contracts.md
+  - docs/standards/frontend-storybook.md
+  - docs/standards/ui-libraries.md
+  - docs/standards/git-branching.md
+  - docs/standards/documentation.md
+
+# Skills active
+skills:
+  backend:
+    - serverless-baseline # conditional: new service / reviewing serverless.ts
+    - serverless-endpoint
+    - middy-patterns
+    - backend-task-execution
+    - backend-test-hardening
+    - log-sanitization
+    - observability-hardening
+    - dynamodb-patterns
+    - async-patterns
+    - idempotency-patterns
+    - cognito-auth-patterns
+    - domain-error-hierarchy
+    - lambda-performance
+    - feature-flags
+    - input-validation-patterns
+    - secret-management
+    - api-versioning
+    - circuit-breaker
+    - http-client-retry
+    - deployment-canary
+    - load-testing-k6
+    - webhook-patterns # conditional: when feature has webhook receiver
+    - encryption-patterns # conditional: when feature handles PII/sensitive data
+    - dynamodb-migrations # conditional: when evolving existing table schema
+    - websocket-apigateway # conditional: when feature needs real-time WebSocket
+    - s3-storage-patterns # conditional: when feature involves file upload/download/storage
+    - powertools-patterns
+    - ddd-hexagonal-patterns
+    - vitest-patterns
+  frontend:
+    - frontend-task-execution
+    - frontend-test-hardening
+    - e2e-flow-hardening
+    - component-governance # always-active: inventory check, reuse/extend/create, API design, deprecation
+    - react-fsd-feature
+    - storybook-component
+    - react-query-patterns
+    - zustand-patterns
+    - form-validation-patterns
+    - msw-mock-patterns
+    - graphql-client-patterns
+    - accessibility-a11y
+    - core-web-vitals
+    - react-patterns
+    # UI library skill — only one of these exists on disk after bootstrap.
+    # The active skill is determined by ui_library in openspec/config.yaml.
+    # See docs/standards/ui-libraries.md for full reference.
+    - tailwind-patterns # active when ui_library = tailwind
+    - mui-patterns # active when ui_library = mui
+    - antd-patterns # active when ui_library = antd
+    - chakra-patterns # active when ui_library = chakra
+    - bootstrap-patterns # active when ui_library = bootstrap
+    - css-modules-patterns # active when ui_library = none
+    - cloudfront-spa-deploy # conditional: when deploying SPA to CloudFront + S3
+    - datadog-rum-patterns
+    - vitest-patterns
+  contracts:
+    - contract-rest
+    - contract-graphql
+    - contract-diff-prep
+  crossCutting:
+    - openspec-proposal
+    - feature-routing
+    - risk-assessment
+    - aws-well-architected-review
+    - security
+    - pr-prep
+    - pr-comment-resolution
+    - comment-learning
+    - review-learning-update
+    - jira-intake
+    - typescript-patterns
+    - dependency-vetting
+
+# Observability config
+observability:
+  platform: cloudwatch-xray # override: cloudwatch-xray | datadog | both
+  structuredLogs: true
+  correlationId: true
+  tracing: true
+  customMetrics: true
+  logRetentionDays: 30

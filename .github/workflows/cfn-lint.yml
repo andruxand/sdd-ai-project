@@ -1,0 +1,23 @@
+name: CloudFormation Lint
+on:
+  pull_request:
+    paths:
+      - 'infra/**'
+jobs:
+  cfn-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for templates
+        id: check
+        run: |
+          count=$(find infra/ -name '*.yaml' -o -name '*.yml' -o -name '*.json' 2>/dev/null | wc -l | tr -d ' ')
+          echo "found=$([[ $count -gt 0 ]] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+      - name: Run cfn-lint
+        if: steps.check.outputs.found == 'true'
+        run: |
+          pip install cfn-lint --quiet
+          cfn-lint infra/**
+      - name: No templates
+        if: steps.check.outputs.found != 'true'
+        run: echo "No CloudFormation templates in infra/ — skipping."

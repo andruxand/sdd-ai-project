@@ -1,0 +1,8 @@
+services/api/serverless.ts  @developer-team @andruxand
+infra/**                    @developer-team @andruxand
+.github/workflows/**        @developer-team @andruxand
+docs/standards/**           @developer-team @andruxand
+openspec/**                 @developer-team @andruxand
+services/api/**             @developer-team @andruxand
+apps/web/**                 @developer-team @andruxand
+packages/shared/ui/**       @developer-team @andruxand

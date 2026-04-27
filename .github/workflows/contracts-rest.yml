@@ -1,0 +1,35 @@
+name: REST Contract Check
+on:
+  pull_request:
+    paths:
+      - 'packages/contracts/**'
+      - 'services/api/src/**'
+jobs:
+  rest-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Check spec exists
+        id: check
+        run: echo "exists=$([[ -f packages/contracts/rest/openapi.yaml ]] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+      - name: Validate OpenAPI spec
+        if: steps.check.outputs.exists == 'true'
+        run: npx @redocly/cli lint packages/contracts/rest/openapi.yaml --format stylish
+      - name: Install oasdiff
+        if: steps.check.outputs.exists == 'true'
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/Tufin/oasdiff/main/install.sh | sh
+      - name: Diff contracts against main
+        if: steps.check.outputs.exists == 'true'
+        run: |
+          git show origin/main:packages/contracts/rest/openapi.yaml > /tmp/openapi-main.yaml 2>/dev/null || echo "No previous spec found — skipping diff."
+          if [ -f /tmp/openapi-main.yaml ]; then
+            oasdiff breaking /tmp/openapi-main.yaml packages/contracts/rest/openapi.yaml
+          fi
