@@ -1,11 +1,12 @@
 schema: core
 
 context:
-  # TODO: change this to your actual project name after bootstrap
-  # Example: project_name: 'my-service'
   project_name: 'template-v3'
   # TODO: set this to your actual UI library after bootstrap (tailwind/mui/antd/chakra/bootstrap/none)
-  ui_library: 'none'
+  ui_library: 'mui'
+  scope: 'fullstack'
+  contracts: 'rest'
+  criticality: 'hardened'
   architecture:
     backend: 'DDD + explicit boundaries where applicable'
     frontend: 'FSD + Atomic inside shared/ui where applicable'
