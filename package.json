@@ -74,7 +74,7 @@
     "storybook": "^10.3.5",
     "turbo": "^2.5.0",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.46.1",
+    "typescript-eslint": "^8.59.1",
     "vite": "^5.4.14",
     "vitest": "^3.2.4",
     "yaml": "^2.8.1"
