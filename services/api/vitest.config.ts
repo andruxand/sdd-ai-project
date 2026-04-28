@@ -11,6 +11,9 @@ export default defineConfig({
         'src/**/*.test.ts',
         // Pure singleton initialization — no testable logic
         'src/shared/observability.ts',
+        // Integration layer covered by k6 smoke tests
+        'src/infrastructure/http/handlers/**/*.ts',
+        'src/shared/middleware/**/*.ts',
       ],
       provider: 'v8',
       reporter: ['text', 'lcov'],

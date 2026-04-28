@@ -7,15 +7,17 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
-// TODO: import your App component here
-// import App from './app/index';
+import App from './app/index.js';
+import { initRum } from './shared/monitoring/rum.js';
+
+// Initialize Datadog RUM before React renders
+initRum();
 
 const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('#root element not found in index.html');
 
 createRoot(rootElement).render(
   <StrictMode>
-    {/* <App /> */}
-    <div>Replace with your App component.</div>
+    <App />
   </StrictMode>,
 );

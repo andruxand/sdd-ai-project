@@ -64,6 +64,10 @@
     "middy",
     "testid",
     "openspec",
+    "wcag",
+    "refetches",
+    "effectful",
+    "visibilitychange",
     "qodo",
     "redocly",
     "datadog",
@@ -176,6 +180,13 @@
     "behaviour",
     "dtos",
     "DTOs",
-    "vitest"
+    "vitest",
+    "transferrables",
+    "colour",
+    "Colour",
+    "neutralise",
+    "subpaths",
+    "chatagent",
+    "rutables"
   ]
 }

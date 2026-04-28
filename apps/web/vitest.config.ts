@@ -2,6 +2,8 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
+    environment: 'jsdom',
+    setupFiles: ['./src/tests/setup.ts'],
     passWithNoTests: false,
     include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
     coverage: {
@@ -11,12 +13,18 @@ export default defineConfig({
         'src/**/*.test.ts',
         'src/**/*.test.tsx',
         'src/**/*.stories.tsx',
-        // Empty scaffold placeholder — no testable exports
-        'src/features/**',
         // React entry points — no unit-testable logic
         'src/main.tsx',
         'src/app/**/*',
         'src/app/index.tsx',
+        // Types-only files
+        'src/features/**/types.ts',
+        'src/features/**/*-query-keys.ts',
+        'src/features/**/index.ts',
+        // Vite environment declarations
+        'src/vite-env.d.ts',
+        // RUM initialization — side-effectful infra module, integration tested
+        'src/shared/monitoring/rum.ts',
       ],
       provider: 'v8',
       reporter: ['text', 'lcov'],

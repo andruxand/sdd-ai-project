@@ -3,18 +3,40 @@
  *
  * App shell — global providers, router, and theme.
  * This is the composition root. No business logic here.
- *
- * Typical structure:
- *   <QueryClientProvider>     ← React Query
- *     <ThemeProvider>         ← ui_library theme (MUI/Chakra/etc.)
- *       <Router>              ← React Router or TanStack Router
- *         <Suspense>          ← Route-level lazy loading boundary
- *           <Routes />
- *         </Suspense>
- *       </Router>
- *     </ThemeProvider>
- *   </QueryClientProvider>
  */
+import { Box, Typography, Container } from '@mui/material';
 
-// Add your app providers and router here.
-// Keep this file thin — delegate to pages/ and features/.
+import { HealthStatus } from '../features/health/index.js';
+
+import { Providers } from './providers.js';
+
+/**
+ * Main App component.
+ * Wraps everything in Providers (React Query + MUI theme).
+ */
+export function App() {
+  return (
+    <Providers>
+      <Container maxWidth="md" sx={{ py: 4 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 3,
+            alignItems: 'center',
+          }}
+        >
+          <Typography variant="h1" component="h1">
+            Health Check Demo
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Service health status updates every 30 seconds.
+          </Typography>
+          <HealthStatus />
+        </Box>
+      </Container>
+    </Providers>
+  );
+}
+
+export default App;

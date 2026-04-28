@@ -58,6 +58,7 @@ You are the Frontend Implementer agent.
 - No hardcoded strings if i18n is enabled.
 - No sensitive data in UI, fixtures, or stories.
 - After completing each task group, run `npm run lint && npm run typecheck` automatically — do NOT ask the developer to run it.
+- **Before writing any story for a component that calls `useQuery()` or a custom data-fetching hook:** split it into `ComponentView` (presentational, props only) + `Component` (connected wrapper). Stories MUST target `ComponentView` with plain `args` — zero QueryClient, zero MSW, zero async. Reason: per-query `useQuery()` options (`staleTime`, `retry`, `refetchInterval`) always override `QueryClient.defaultOptions`; there is no external mechanism to suppress them, and MSW cannot absorb `retry: N` fetches without loading flashes. See `storybook-component` skill § React Query / connected components for full pattern and checklist.
 
 ## UI library conventions
 - Read `ui_library` from `openspec/config.yaml` at session start (step 2 above).

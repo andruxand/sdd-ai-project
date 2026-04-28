@@ -428,6 +428,166 @@ process.env.AWS_REGION = 'us-east-1';
 
 ---
 
+## Frontend component tests — React + Testing Library
+
+### Required vitest.config.ts settings
+
+```ts
+// apps/web/vitest.config.ts
+export default defineConfig({
+  test: {
+    environment: 'jsdom', // ← REQUIRED for DOM APIs
+    setupFiles: ['./src/tests/setup.ts'],
+    coverage: {
+      exclude: [
+        'src/**/*.test.ts',
+        'src/**/*.test.tsx',
+        'src/**/*.stories.tsx',
+        'src/main.tsx',
+        'src/vite-env.d.ts',
+        'src/**/*.d.ts',
+        'src/shared/monitoring/rum.ts', // Datadog RUM — not unit-testable
+        'src/features/**/index.ts',
+        'src/features/**/types.ts',
+        'src/features/**/*-query-keys.ts',
+      ],
+    },
+  },
+});
+```
+
+### Required setup.ts
+
+```ts
+// src/tests/setup.ts
+import '@testing-library/jest-dom/vitest'; // ← /vitest, NOT /extend-expect
+import { vi } from 'vitest';
+
+// Mock Datadog RUM — prevents network calls in tests
+vi.mock('@datadog/browser-rum', () => ({
+  datadogRum: {
+    init: vi.fn(),
+    startSessionReplayRecording: vi.fn(),
+    setUser: vi.fn(),
+    clearUser: vi.fn(),
+    addAction: vi.fn(),
+  },
+}));
+```
+
+### Pattern: mocking a hook for state tests (preferred over QueryClient cache)
+
+When a component consumes a React Query hook, **mock the hook directly** rather than pre-populating the QueryClient cache. This avoids async race conditions and test pollution.
+
+```ts
+// ✅ Mock at module level — vi.mock is hoisted
+vi.mock('../api/use-my-hook.js');
+
+// Import after mock declaration
+import { useMyHook } from '../api/use-my-hook.js';
+import { MyComponent } from './MyComponent.js';
+
+// Cleanup
+afterEach(() => { cleanup(); vi.clearAllMocks(); });
+
+// Per-test setup
+it('renders ok state', () => {
+  vi.mocked(useMyHook).mockReturnValue({
+    data: { status: 'ok' },
+    isLoading: false,
+    isError: false,
+  } as ReturnType<typeof useMyHook>);
+
+  render(<QueryClientProvider client={createTestQueryClient()}><MyComponent /></QueryClientProvider>);
+  expect(screen.getByText('Operational')).toBeInTheDocument();
+});
+
+// ❌ Avoid — pre-populating cache causes cleanup issues
+const qc = new QueryClient();
+qc.setQueryData(['key'], data); // becomes stale/shared across tests
+```
+
+### Pattern: hook tests with MSW + renderHook
+
+```ts
+import { renderHook, waitFor } from '@testing-library/react';
+import { http, HttpResponse } from 'msw';
+import { setupServer } from 'msw/node';
+
+const server = setupServer();
+beforeAll(() => server.listen({ onUnhandledRequest: 'bypass' }));
+afterEach(() => { server.resetHandlers(); vi.clearAllMocks(); });
+afterAll(() => server.close());
+
+function createWrapper() {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false, refetchOnWindowFocus: false } },
+  });
+  function wrapper({ children }: { children: React.ReactNode }) {
+    return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+  }
+  return { queryClient, wrapper };
+}
+
+it('fetches and returns data', async () => {
+  server.use(http.get('/health', () => HttpResponse.json({ status: 'ok' })));
+  const { wrapper } = createWrapper();
+  const { result } = renderHook(() => useMyHook(), { wrapper });
+  await waitFor(() => expect(result.current.isSuccess).toBe(true));
+  expect(result.current.data).toEqual({ status: 'ok' });
+});
+
+// ⚠️ When hook has retry > 0, increase waitFor timeout
+// retry: 2 means 3 total attempts — allow at least (retry + 1) * 1000ms
+it('sets isError after retries exhausted', async () => {
+  server.use(http.get('/health', () => HttpResponse.error()));
+  const { wrapper } = createWrapper();
+  const { result } = renderHook(() => useMyHook(), { wrapper });
+  await waitFor(() => expect(result.current.isError).toBe(true), { timeout: 10_000 });
+});
+```
+
+### Pattern: polling with fake timers
+
+```ts
+it('refetches every 30 seconds', async () => {
+  vi.useFakeTimers();
+  let calls = 0;
+  server.use(
+    http.get('/health', () => {
+      calls++;
+      return HttpResponse.json(data);
+    }),
+  );
+
+  const { wrapper } = createWrapper(); // NO refetchInterval override in this client
+  renderHook(() => useMyHook(), { wrapper });
+
+  await vi.advanceTimersByTimeAsync(500); // initial fetch
+  const initial = calls;
+  expect(initial).toBeGreaterThanOrEqual(1);
+
+  await vi.advanceTimersByTimeAsync(30_000); // trigger polling interval
+  expect(calls).toBeGreaterThan(initial);
+
+  vi.useRealTimers(); // ← always restore after fake timers
+});
+```
+
+### Frontend-specific error table
+
+| Error                                                           | Cause                                                                  | Fix                                                                                  |
+| --------------------------------------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `Cannot convert undefined or null to object` in `expect.extend` | Wrong vitest-axe import                                                | `import * as m from 'vitest-axe/matchers'` then `expect.extend(m)`                   |
+| `Found multiple elements with the text`                         | No `cleanup()` between tests                                           | `afterEach(() => cleanup())`                                                         |
+| axe test times out (>5s) with MUI                               | `color-contrast` rule tries to compute CSS styles unavailable in jsdom | Disable rule: `rules: { 'color-contrast': { enabled: false } }`                      |
+| `isError` never becomes `true`                                  | Hook has `retry > 0` and `waitFor` default timeout is 1s               | Pass `{ timeout: (retryCount + 1) * 1000 + 500 }` to `waitFor`                       |
+| `Axe is already running`                                        | Previous axe test timed out, leaving axe in a running state            | Fix the timeout error first — each axe run must complete before the next             |
+| `aria-progressbar-name` axe violation                           | MUI `CircularProgress` missing `aria-label`                            | Add `aria-label="Loading..."` prop to `<CircularProgress>`                           |
+| `vi.restoreAllMocks()` breaks polling test                      | Restores the mocked hook to original implementation                    | Use `vi.clearAllMocks()` instead of `restoreAllMocks()` when you still need the mock |
+
+---
+
 ## Checklist
 
 - [ ] All test files use `vi.mock()` not `jest.mock()`.

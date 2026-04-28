@@ -249,6 +249,68 @@ npm install --save-dev @storybook/addon-a11y
 
 ---
 
+## axe-core in jsdom — limitations and workarounds
+
+jsdom does not compute CSS, so some axe rules produce false positives or hang indefinitely.
+Apply these workarounds **every time** you run `axe` inside a Vitest/jsdom environment.
+
+### Required import pattern (vitest-axe)
+
+```ts
+// ✅ Correct — vitest-axe provides matchers as a namespace export
+import * as axeMatchers from 'vitest-axe/matchers';
+import { axe } from 'vitest-axe';
+
+expect.extend(axeMatchers);
+
+// ❌ Incorrect — toHaveNoViolations is not a named export
+import { toHaveNoViolations } from 'vitest-axe'; // throws at runtime
+```
+
+### Disabled rules and test timeout
+
+```ts
+const AXE_OPTIONS: Parameters<typeof axe>[1] = {
+  runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa'] },
+  rules: {
+    // color-contrast hangs in jsdom — computed styles are always rgb(0,0,0)
+    'color-contrast': { enabled: false },
+  },
+};
+
+it('has no a11y violations', async () => {
+  const { container } = render(<MyComponent />);
+  const results = await axe(container, AXE_OPTIONS);
+  expect(results).toHaveNoViolations();
+}, 15_000); // axe DOM traversal is slow in jsdom — raise timeout
+```
+
+### Rules triggered by common MUI components
+
+| Violation rule          | Cause                                         | Fix                                                       |
+| ----------------------- | --------------------------------------------- | --------------------------------------------------------- |
+| `aria-progressbar-name` | `<CircularProgress>` has no accessible name   | Add `aria-label="..."` prop to `<CircularProgress>`       |
+| `color-contrast`        | jsdom returns `rgb(0,0,0)` for all colors     | Disable rule via `AXE_OPTIONS`                            |
+| `button-name`           | `<IconButton>` with icon-only child           | Add `aria-label` or `<Tooltip title>`                     |
+| `image-alt`             | `<img>` without `alt`                         | Add `alt` prop (empty string for decorative images)       |
+| `label`                 | `<TextField>` missing `label` or `aria-label` | Pass `label` prop or `inputProps={{ 'aria-label': ... }}` |
+
+### "Axe is already running" error
+
+Happens when a previous `axe()` call timed out and left the DOM instrumented.
+
+```ts
+// ✅ Prevent with afterEach cleanup
+afterEach(() => {
+  cleanup(); // React Testing Library — removes rendered DOM
+  vi.clearAllMocks();
+});
+```
+
+Always combine `cleanup()` with the raised timeout above — if axe finishes before the timeout, cleanup will remove the instrumented DOM, preventing the "already running" error in the next test.
+
+---
+
 ## DO / DON'T
 
 | ✅ DO                                      | ❌ DON'T                                    |
