@@ -42,6 +42,11 @@ module.exports = {
         'uses-optimized-images': 'warn',
         'uses-responsive-images': 'warn',
         'uses-text-compression': 'error',
+
+        // Disable audits that produce NaN scores (not applicable to this SPA)
+        // or that fire because the preview build points to a stub API URL.
+        'lcp-lazy-loaded': 'off',
+        'errors-in-console': 'off',
       },
     },
     upload: {

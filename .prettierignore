@@ -9,3 +9,5 @@ storybook-static/
 .generated/
 package-lock.json
 *.lock
+# Generated files — do not reformat
+apps/web/public/mockServiceWorker.js
