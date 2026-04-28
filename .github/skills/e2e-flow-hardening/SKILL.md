@@ -13,6 +13,21 @@ Tool: Playwright. Config: `apps/web/playwright.config.ts`. Tests: `apps/web/e2e/
    Run `npx playwright install`
 3. Confirm `@axe-core/playwright` is in devDependencies; if missing run:
    `npm install --save-dev @axe-core/playwright`
+4. Verify `playwright.config.ts` has `webServer` defined **unconditionally** (not wrapped in `process.env.CI ? undefined : ...`).
+   Playwright manages server start/stop automatically — removing `webServer` in CI silently leaves no server running.
+
+   ✅ Correct:
+   ```ts
+   webServer: {
+     command: 'npm run dev --workspace=apps/web',
+     url: 'http://localhost:5173',
+     reuseExistingServer: !process.env.CI,
+   }
+   ```
+   ❌ Wrong:
+   ```ts
+   webServer: process.env.CI ? undefined : { ... }
+   ```
 
 ## When to add E2E tests
 - New user-facing journey (login, checkout, form submission).
