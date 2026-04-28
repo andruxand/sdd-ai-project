@@ -483,7 +483,10 @@ When a component consumes a React Query hook, **mock the hook directly** rather 
 // ✅ Mock at module level — vi.mock is hoisted
 vi.mock('../api/use-my-hook.js');
 
-// Import after mock declaration
+// Import after mock declaration — this placement is INTENTIONAL.
+// ESLint (import-x/order) will emit a warning here because the import
+// follows a non-import statement. This is expected and non-blocking;
+// treat it as a known false-positive for the vi.mock hoisting pattern.
 import { useMyHook } from '../api/use-my-hook.js';
 import { MyComponent } from './MyComponent.js';
 
