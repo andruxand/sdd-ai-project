@@ -33,11 +33,11 @@ export default defineConfig({
     },
   ],
 
-  webServer: process.env.CI
-    ? undefined
-    : {
-        command: 'npm run dev',
-        url: 'http://localhost:5173',
-        reuseExistingServer: true,
-      },
+  webServer: {
+    // Run from apps/web/ context — no --workspace flag needed
+    command: 'npm run dev',
+    url: 'http://localhost:5173',
+    // In CI the server is always cold-started; locally reuse if already running
+    reuseExistingServer: !process.env.CI,
+  },
 });

@@ -46,3 +46,47 @@ Run `npm run arch:lint` locally to check before pushing.
 - Every interactive element: visible label or `aria-label`. Use semantic HTML.
 - Import order: React → external libs → internal shared → relative. Enforced by ESLint import/order.
 - Do not import from `services/` or `packages/contracts/` directly — use types from `packages/shared/`.
+
+## Storybook — React Query stories
+
+> **Hard rule (DIG-123456):** per-query options in `useQuery({ staleTime: 0, retry: 2 })` **always override** `QueryClient.defaultOptions`. There is no external mechanism to suppress them. MSW cannot prevent loading flashes when `retry: 2` is hard-coded in the hook — the component fires 3 requests before `isError: true` shows.
+
+### Required: split before you story
+
+Before writing any story for a component that wraps a data-fetching hook:
+
+1. **Split** the component into `ComponentView` (pure presentational, props only) + `Component` (thin connected wrapper calling the hook).
+2. **Story** the `ComponentView` only — pass `isLoading`, `isError`, `data` as plain `args`.
+
+```tsx
+// MyComponent.tsx
+export function MyComponentView({ isLoading, isError, data }: MyComponentViewProps) { /* render only */ }
+export function MyComponent() {
+  const { data, isLoading, isError } = useMyQuery();
+  return <MyComponentView data={data} isLoading={isLoading} isError={isError} />;
+}
+
+// MyComponent.stories.tsx — zero QueryClient, zero MSW, zero async
+export const OK:         Story = { args: { isLoading: false, isError: false, data: { ... } } };
+export const ErrorState: Story = { args: { isLoading: false, isError: true,  data: undefined } };
+export const Loading:    Story = { args: { isLoading: true,  isError: false,  data: undefined } };
+```
+
+### MSW: integration-level stories only
+
+`msw-storybook-addon` (already configured in this project) is appropriate **only** for stories of the connected `Component` — e.g., to document the real fetch lifecycle or run Playwright tests against a mocked API. Always set `retry: false` in the story-local QueryClient when using MSW. URL patterns require a scheme: `http://*/path` not `*/path`.
+
+See `docs/standards/frontend-storybook.md § React Query in Storybook` for full patterns and anti-patterns.
+
+## HTML scaffolding requirements
+
+Every app entry point must have:
+
+- `<meta name="description" content="...">` — required by Lighthouse; fails CI without it.
+- `apps/web/public/robots.txt` with at minimum `User-agent: *\nAllow: /` — required by LHCI; fails CI without it.
+
+When setting up MSW:
+
+- Run `npx msw init public/` to generate `mockServiceWorker.js`.
+- Immediately add `apps/web/public/mockServiceWorker.js` to `.prettierignore`.
+  Prettier rewrites the generated file on every run, causing CI Prettier checks to fail.

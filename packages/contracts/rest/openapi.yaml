@@ -25,24 +25,71 @@ paths:
   /health:
     get:
       operationId: getHealth
-      summary: Health check
-      description: Returns service health status.
+      summary: Health check endpoint
+      description: |
+        Returns service health status, version, and timestamp.
+        This endpoint is public (no authentication required) and designed
+        for monitoring systems and operations dashboards.
       tags:
         - System
+      security: []
       responses:
         '200':
-          description: Service is healthy.
+          description: Service is healthy and responding.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: ok
+                $ref: '#/components/schemas/HealthResponse'
+              examples:
+                healthy:
+                  summary: Service is operating normally
+                  value:
+                    status: ok
+                    version: 1.2.3
+                    timestamp: '2026-04-27T10:30:00.000Z'
+                degraded:
+                  summary: Service is operating with degraded performance
+                  value:
+                    status: degraded
+                    version: 1.2.3
+                    timestamp: '2026-04-27T10:30:15.500Z'
 
 components:
-  schemas: {}
+  schemas:
+    HealthResponse:
+      type: object
+      required:
+        - status
+        - version
+        - timestamp
+      properties:
+        status:
+          $ref: '#/components/schemas/HealthStatus'
+          description: Current health status of the service.
+        version:
+          type: string
+          description: |
+            Semantic version of the deployed service (e.g., 1.2.3).
+            Returns "unknown" if version cannot be determined.
+          example: 1.2.3
+        timestamp:
+          type: string
+          format: date-time
+          description: |
+            ISO 8601 timestamp when the health check was performed.
+            Always in UTC timezone.
+          example: '2026-04-27T10:30:00.000Z'
+      description: Response schema for the health check endpoint.
+
+    HealthStatus:
+      type: string
+      enum:
+        - ok
+        - degraded
+      description: |
+        Health status enumeration:
+        - `ok`: Service is operating normally with all systems functional.
+        - `degraded`: Service is operational but experiencing reduced performance or partial failures.
   # Example: import shared schemas from components/
   # schemas:
   #   Order:

@@ -58,6 +58,7 @@ You are the Frontend Implementer agent.
 - No hardcoded strings if i18n is enabled.
 - No sensitive data in UI, fixtures, or stories.
 - After completing each task group, run `npm run lint && npm run typecheck` automatically — do NOT ask the developer to run it.
+- **Before writing any story for a component that calls `useQuery()` or a custom data-fetching hook:** split it into `ComponentView` (presentational, props only) + `Component` (connected wrapper). Stories MUST target `ComponentView` with plain `args` — zero QueryClient, zero MSW, zero async. Reason: per-query `useQuery()` options (`staleTime`, `retry`, `refetchInterval`) always override `QueryClient.defaultOptions`; there is no external mechanism to suppress them, and MSW cannot absorb `retry: N` fetches without loading flashes. See `storybook-component` skill § React Query / connected components for full pattern and checklist.
 
 ## UI library conventions
 - Read `ui_library` from `openspec/config.yaml` at session start (step 2 above).
@@ -86,6 +87,11 @@ You are the Frontend Implementer agent.
 - Feature-specific -> `apps/web/src/features/<feature>/`
 - Features do NOT import from other features.
 
+## Scaffolding requirements (new app or new MSW setup)
+- **MSW**: after running `npx msw init public/`, immediately add `apps/web/public/mockServiceWorker.js` to `.prettierignore`. This is a generated file — Prettier must never touch it.
+- **index.html**: every app must have `<meta name="description" content="...">` inside `<head>`. Lighthouse fails the build without it.
+- **robots.txt**: every app must have `apps/web/public/robots.txt` with at minimum `User-agent: *\nAllow: /`. Lighthouse fails the build without it.
+
 ## Exit checklist
 - [ ] Component governance: inventory check done before implementing.
 - [ ] Decision documented (reuse/extend/create) — if new, JSDoc `@remarks` explains why.
@@ -101,6 +107,9 @@ You are the Frontend Implementer agent.
 - [ ] No `any`, no magic values, no inline styles.
 - [ ] Datadog RUM action for key user interactions (if RUM enabled).
 - [ ] No sensitive data exposed.
+- [ ] If MSW was initialised: `apps/web/public/mockServiceWorker.js` added to `.prettierignore`.
+- [ ] `index.html` has `<meta name="description">`.
+- [ ] `apps/web/public/robots.txt` exists.
 - [ ] `npm run lint && npm run typecheck` passed — run it yourself, do not ask the developer.
 - [ ] OpenSpec tasks updated.
 - [ ] If this is the last task group in the implementation phase, generate handoff with `/handoff`.
