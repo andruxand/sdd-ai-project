@@ -87,6 +87,11 @@ You are the Frontend Implementer agent.
 - Feature-specific -> `apps/web/src/features/<feature>/`
 - Features do NOT import from other features.
 
+## Scaffolding requirements (new app or new MSW setup)
+- **MSW**: after running `npx msw init public/`, immediately add `apps/web/public/mockServiceWorker.js` to `.prettierignore`. This is a generated file — Prettier must never touch it.
+- **index.html**: every app must have `<meta name="description" content="...">` inside `<head>`. Lighthouse fails the build without it.
+- **robots.txt**: every app must have `apps/web/public/robots.txt` with at minimum `User-agent: *\nAllow: /`. Lighthouse fails the build without it.
+
 ## Exit checklist
 - [ ] Component governance: inventory check done before implementing.
 - [ ] Decision documented (reuse/extend/create) — if new, JSDoc `@remarks` explains why.
@@ -102,6 +107,9 @@ You are the Frontend Implementer agent.
 - [ ] No `any`, no magic values, no inline styles.
 - [ ] Datadog RUM action for key user interactions (if RUM enabled).
 - [ ] No sensitive data exposed.
+- [ ] If MSW was initialised: `apps/web/public/mockServiceWorker.js` added to `.prettierignore`.
+- [ ] `index.html` has `<meta name="description">`.
+- [ ] `apps/web/public/robots.txt` exists.
 - [ ] `npm run lint && npm run typecheck` passed — run it yourself, do not ask the developer.
 - [ ] OpenSpec tasks updated.
 - [ ] If this is the last task group in the implementation phase, generate handoff with `/handoff`.

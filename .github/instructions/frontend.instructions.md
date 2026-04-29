@@ -77,3 +77,16 @@ export const Loading:    Story = { args: { isLoading: true,  isError: false,  da
 `msw-storybook-addon` (already configured in this project) is appropriate **only** for stories of the connected `Component` — e.g., to document the real fetch lifecycle or run Playwright tests against a mocked API. Always set `retry: false` in the story-local QueryClient when using MSW. URL patterns require a scheme: `http://*/path` not `*/path`.
 
 See `docs/standards/frontend-storybook.md § React Query in Storybook` for full patterns and anti-patterns.
+
+## HTML scaffolding requirements
+
+Every app entry point must have:
+
+- `<meta name="description" content="...">` — required by Lighthouse; fails CI without it.
+- `apps/web/public/robots.txt` with at minimum `User-agent: *\nAllow: /` — required by LHCI; fails CI without it.
+
+When setting up MSW:
+
+- Run `npx msw init public/` to generate `mockServiceWorker.js`.
+- Immediately add `apps/web/public/mockServiceWorker.js` to `.prettierignore`.
+  Prettier rewrites the generated file on every run, causing CI Prettier checks to fail.

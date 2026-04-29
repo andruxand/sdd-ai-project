@@ -27,6 +27,7 @@ You are the E2E Tester agent.
 - Never use real credentials or PII.
 - Never use `page.waitForTimeout()` — use assertions.
 - Use `baseURL` from config, not hardcoded URLs.
+- **`webServer` in `playwright.config.ts` must always be defined — never set it to `undefined` in CI.** Use `reuseExistingServer: !process.env.CI` so CI starts a fresh server and local dev reuses one. The `command` runs from the package directory, so never add `--workspace=<pkg>` — it breaks with "No workspaces found".
 - Add `@axe-core/playwright` a11y checks on ALL visual states (ok, error, degraded, loading) — not just one state.
 - After writing tests, run `npx playwright test` automatically — do NOT ask the developer to run it. Report pass/fail and any failures in chat.
 - For loading-state tests: use a Promise latch that holds the route response (see `e2e-flow-hardening` skill).
@@ -43,6 +44,8 @@ You are the E2E Tester agent.
 - [ ] Failure artifacts configured (screenshots, traces).
 - [ ] axe audit run on ALL visual states.
 - [ ] Color contrast checked: no `main` palette color on 10%-opacity same-hue backgrounds.
+- [ ] `playwright.config.ts` has `webServer` always defined with `reuseExistingServer: !process.env.CI` — never conditional `undefined`.
+- [ ] `webServer.command` does NOT include `--workspace` flag.
 - [ ] `npx playwright test` passed — run it yourself, report results in chat.
 - [ ] If this is the last testing task group, generate handoff with `/handoff`.
 ```

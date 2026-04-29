@@ -224,3 +224,4 @@ export default defineConfig({
 - [ ] React Query test client has `retry: false`.
 - [ ] No real network calls in unit or integration tests.
 - [ ] No sensitive data (tokens, PII) hardcoded in handler responses.
+- [ ] `apps/web/public/mockServiceWorker.js` added to `.prettierignore` (generated file — Prettier breaks it).

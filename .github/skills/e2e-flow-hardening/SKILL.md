@@ -140,6 +140,28 @@ color: theme.palette.success.dark   // not .main
 - Artifacts: screenshots + traces on failure.
 - Configure `retries: 1` in CI only.
 
+### `webServer` — always defined, never conditional
+
+Do NOT gate `webServer` on `process.env.CI`. When it is `undefined`, Playwright skips starting a server and tests fail with `ERR_CONNECTION_REFUSED`.
+
+```typescript
+// playwright.config.ts — CORRECT
+export default defineConfig({
+  webServer: {
+    command: 'npm run dev', // runs from the package dir — NO --workspace flag
+    url: 'http://localhost:5173',
+    reuseExistingServer: !process.env.CI, // CI always starts fresh
+  },
+  use: { baseURL: 'http://localhost:5173' },
+});
+
+// WRONG — never do this:
+// webServer: process.env.CI ? undefined : { command: 'npm run dev', ... }
+```
+
+> The `command` is executed from the workspace package directory, not the repo root.
+> Adding `--workspace=apps/web` inside the command string causes _"No workspaces found: --workspace=apps/web"_ and the server never starts.
+
 ## Anti-patterns
 
 - Do NOT test API logic through E2E.
@@ -153,6 +175,8 @@ color: theme.palette.success.dark   // not .main
 
 - [ ] `nvm use` run before any command.
 - [ ] `npx playwright install` verified — no missing browser binaries.
+- [ ] `playwright.config.ts` `webServer` is always defined (not conditional `undefined`).
+- [ ] `webServer.command` runs from the package dir — no `--workspace` flag.
 - [ ] `@axe-core/playwright` installed.
 - [ ] Critical journeys covered (load, error, restore, state variants).
 - [ ] Tests use accessible locators.
